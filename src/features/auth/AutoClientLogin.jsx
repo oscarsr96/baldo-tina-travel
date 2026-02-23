@@ -14,7 +14,7 @@ export default function AutoClientLogin() {
       await supabase.auth.signOut();
       const { error } = await supabase.auth.signInWithPassword(DEMO_CLIENT);
       if (error) {
-        setError("No se pudo iniciar sesión automática");
+        setError(`Error: ${error.message}`);
         return;
       }
       window.location.href = "/dashboard";
