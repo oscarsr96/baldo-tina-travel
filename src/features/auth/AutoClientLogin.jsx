@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "./AuthContext";
+import { supabase } from "../../lib/supabase";
 
 const DEMO_CLIENT = {
   email: "oscarsrueda96@gmail.com",
@@ -8,20 +7,18 @@ const DEMO_CLIENT = {
 };
 
 export default function AutoClientLogin() {
-  const { user, profile, signIn, signOut } = useAuth();
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (user && profile?.role === "CLIENT") return;
-
     const doLogin = async () => {
-      // Si está logueado como otro rol, cerrar sesión primero
-      if (user) await signOut();
-
-      const { error } = await signIn(DEMO_CLIENT.email, DEMO_CLIENT.password);
-      if (error) setError("No se pudo iniciar sesión automática");
+      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signInWithPassword(DEMO_CLIENT);
+      if (error) {
+        setError("No se pudo iniciar sesión automática");
+        return;
+      }
+      window.location.href = "/dashboard";
     };
-
     doLogin();
   }, []);
 
@@ -31,10 +28,6 @@ export default function AutoClientLogin() {
         <p className="text-red">{error}</p>
       </div>
     );
-  }
-
-  if (user && profile?.role === "CLIENT") {
-    return <Navigate to="/dashboard" replace />;
   }
 
   return (

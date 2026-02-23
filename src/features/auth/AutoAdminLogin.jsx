@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "./AuthContext";
+import { supabase } from "../../lib/supabase";
 
 const DEMO_ADMIN = {
   email: "oscarsr96@hotmail.com",
@@ -8,19 +7,18 @@ const DEMO_ADMIN = {
 };
 
 export default function AutoAdminLogin() {
-  const { user, profile, signIn, signOut } = useAuth();
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (user && profile?.role === "ADMIN") return;
-
     const doLogin = async () => {
-      if (user) await signOut();
-
-      const { error } = await signIn(DEMO_ADMIN.email, DEMO_ADMIN.password);
-      if (error) setError("No se pudo iniciar sesión automática");
+      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signInWithPassword(DEMO_ADMIN);
+      if (error) {
+        setError("No se pudo iniciar sesión automática");
+        return;
+      }
+      window.location.href = "/admin";
     };
-
     doLogin();
   }, []);
 
@@ -30,10 +28,6 @@ export default function AutoAdminLogin() {
         <p className="text-red">{error}</p>
       </div>
     );
-  }
-
-  if (user && profile?.role === "ADMIN") {
-    return <Navigate to="/admin" replace />;
   }
 
   return (
