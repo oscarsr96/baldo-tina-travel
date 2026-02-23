@@ -13,6 +13,7 @@ import ProfilePage from "./features/client/ProfilePage";
 import AdminDashboard from "./features/admin/AdminDashboard";
 import AdminRequestDetail from "./features/admin/AdminRequestDetail";
 import RootIndex from "./features/landing/RootIndex";
+import AutoAdminLogin from "./features/auth/AutoAdminLogin";
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
       { index: true, element: <RootIndex /> },
       { path: "login", element: <LoginPage /> },
       { path: "registro", element: <RegisterPage /> },
+      { path: "auto-admin", element: <AutoAdminLogin /> },
     ],
   },
   {
