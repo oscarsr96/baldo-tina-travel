@@ -8,16 +8,20 @@ const DEMO_ADMIN = {
 };
 
 export default function AutoAdminLogin() {
-  const { user, profile, signIn } = useAuth();
+  const { user, profile, signIn, signOut } = useAuth();
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Si ya está logueado como admin, no hacer nada
     if (user && profile?.role === "ADMIN") return;
 
-    signIn(DEMO_ADMIN.email, DEMO_ADMIN.password).then(({ error }) => {
+    const doLogin = async () => {
+      if (user) await signOut();
+
+      const { error } = await signIn(DEMO_ADMIN.email, DEMO_ADMIN.password);
       if (error) setError("No se pudo iniciar sesión automática");
-    });
+    };
+
+    doLogin();
   }, []);
 
   if (error) {

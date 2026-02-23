@@ -8,15 +8,21 @@ const DEMO_CLIENT = {
 };
 
 export default function AutoClientLogin() {
-  const { user, profile, signIn } = useAuth();
+  const { user, profile, signIn, signOut } = useAuth();
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (user && profile?.role === "CLIENT") return;
 
-    signIn(DEMO_CLIENT.email, DEMO_CLIENT.password).then(({ error }) => {
+    const doLogin = async () => {
+      // Si está logueado como otro rol, cerrar sesión primero
+      if (user) await signOut();
+
+      const { error } = await signIn(DEMO_CLIENT.email, DEMO_CLIENT.password);
       if (error) setError("No se pudo iniciar sesión automática");
-    });
+    };
+
+    doLogin();
   }, []);
 
   if (error) {
