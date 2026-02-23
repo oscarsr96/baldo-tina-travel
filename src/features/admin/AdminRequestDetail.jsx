@@ -6,7 +6,7 @@ import { useAuth } from "../auth/AuthContext";
 import { generateRoutes } from "../../utils/routeGenerator";
 import { cities } from "../../data/cities";
 import StatusBadge from "../../components/ui/StatusBadge";
-import RouteCard from "../../components/RouteCard";
+import ProposalGrid from "../../components/ProposalGrid";
 import Modal from "../../components/ui/Modal";
 
 const STATUS_FLOW = ["pendiente", "en_proceso", "propuestas_listas", "archivado"];
@@ -264,37 +264,12 @@ export default function AdminRequestDetail() {
       {proposals.length > 0 && (
         <div className="mb-6">
           <h3 className="text-lg font-bold text-text mb-4">Propuestas ({proposals.length})</h3>
-          <div className="space-y-4">
-            {proposals.map((prop) => (
-              <div key={prop.id} className="relative">
-                {/* Admin controls */}
-                <div className="flex items-center gap-2 mb-2">
-                  <button
-                    onClick={() => toggleVisibility(prop.id, prop.is_visible)}
-                    className={`text-xs px-3 py-1 rounded-full border font-medium cursor-pointer transition-colors ${
-                      prop.is_visible
-                        ? "bg-green/15 border-green text-green"
-                        : "bg-input border-border text-muted"
-                    }`}
-                  >
-                    {prop.is_visible ? "Visible para cliente" : "Oculta"}
-                  </button>
-                  <button
-                    onClick={() => setEditModal(prop.id)}
-                    className="text-xs text-accent hover:underline cursor-pointer"
-                  >
-                    {prop.admin_notes ? "Editar nota" : "Añadir nota"}
-                  </button>
-                </div>
-
-                <RouteCard
-                  route={prop.route_data}
-                  formData={prop.form_data}
-                  adminNotes={prop.admin_notes}
-                />
-              </div>
-            ))}
-          </div>
+          <ProposalGrid
+            proposals={proposals}
+            adminControls
+            onToggleVisibility={toggleVisibility}
+            onEditNotes={(propId) => setEditModal(propId)}
+          />
         </div>
       )}
 

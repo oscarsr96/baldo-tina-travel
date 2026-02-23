@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import StatusBadge from "../../components/ui/StatusBadge";
-import RouteCard from "../../components/RouteCard";
+import ProposalGrid from "../../components/ProposalGrid";
 
 export default function ClientRequestDetail() {
   const { id } = useParams();
@@ -137,23 +137,9 @@ export default function ClientRequestDetail() {
 
       {/* Propuestas */}
       {proposals.length > 0 ? (
-        <div className="space-y-6">
-          <h3 className="text-lg font-bold text-text">Tus propuestas personalizadas</h3>
-          {proposals.map((prop) => (
-            <div key={prop.id}>
-              <RouteCard
-                route={prop.route_data}
-                formData={prop.form_data}
-                adminNotes={prop.admin_notes}
-              />
-              {prop.admin_notes && (
-                <div className="mt-2 bg-accent/5 border border-accent/20 rounded-lg p-4">
-                  <p className="text-xs text-accent font-semibold mb-1">Nota del equipo</p>
-                  <p className="text-sm text-text">{prop.admin_notes}</p>
-                </div>
-              )}
-            </div>
-          ))}
+        <div>
+          <h3 className="text-lg font-bold text-text mb-4">Tus propuestas personalizadas</h3>
+          <ProposalGrid proposals={proposals} />
         </div>
       ) : (
         <div className="bg-card border border-border rounded-xl p-8 text-center">
