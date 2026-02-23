@@ -11,6 +11,12 @@ export default function PublicLayout() {
           </Link>
           <div className="flex items-center gap-3">
             <Link
+              to="/auto-cliente"
+              className="text-sm text-muted hover:text-accent transition-colors"
+            >
+              Cliente
+            </Link>
+            <Link
               to="/auto-admin"
               className="text-sm text-muted hover:text-accent transition-colors"
             >
