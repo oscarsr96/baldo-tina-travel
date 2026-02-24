@@ -1,7 +1,7 @@
-import CityDetail from "./CityDetail";
+import CityItinerary from "./CityItinerary";
 import { exportRoutePDF } from "../utils/pdfExport";
 
-export default function RouteDetail({ route, formData, adminNotes }) {
+export default function RouteDetail({ route, formData, adminNotes, preferences = [] }) {
   return (
     <div className="border-t border-border">
       {/* Transporte */}
@@ -33,7 +33,7 @@ export default function RouteDetail({ route, formData, adminNotes }) {
       <div className="p-5 space-y-4">
         <h4 className="text-sm font-semibold text-muted uppercase tracking-wider">Detalle por ciudad</h4>
         {route.cityDetails.map((city) => (
-          <CityDetail key={city.cityId} city={city} tier={route.tier} />
+          <CityItinerary key={city.cityId} city={city} tier={route.tier} preferences={preferences} />
         ))}
       </div>
 

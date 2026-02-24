@@ -125,7 +125,8 @@ export function exportRoutePDF(route, formData, adminNotes = '') {
     doc.setFont("helvetica", "bold");
     doc.text("Qué ver:", margin + 4, y);
     doc.setFont("helvetica", "normal");
-    doc.text(city.highlights.join(", "), margin + 22, y);
+    const highlightNames = city.highlights.map((h) => (typeof h === "string" ? h : h.name));
+    doc.text(highlightNames.join(", "), margin + 22, y);
     y += 5;
 
     if (city.recommendedZones.length > 0) {

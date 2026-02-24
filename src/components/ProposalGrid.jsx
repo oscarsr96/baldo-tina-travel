@@ -157,6 +157,7 @@ export default function ProposalGrid({
             route={selected.route_data}
             formData={selected.form_data}
             adminNotes={selected.admin_notes}
+            preferences={selected.form_data?.preferences || []}
           />
         </div>
       )}

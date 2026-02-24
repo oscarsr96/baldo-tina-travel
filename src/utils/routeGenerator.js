@@ -89,6 +89,7 @@ function generateRoute(tier, selectedCityIds, totalDays, preferences, travelers)
       name: city.name,
       emoji: city.emoji,
       country: city.country,
+      photo: city.photo || null,
       nights,
       accommodation: {
         type: ACCOMMODATION_LABELS[tier],
@@ -104,6 +105,8 @@ function generateRoute(tier, selectedCityIds, totalDays, preferences, travelers)
         total: transportCostPerDay * nights,
       },
       highlights: city.highlights,
+      foodSpots: city.foodSpots || [],
+      eveningIdeas: city.eveningIdeas || [],
       recommendedZones: zones.recommended,
       avoidZones: zones.avoid,
       subtotal: (accCostPerNight + foodCostPerDay + transportCostPerDay) * nights,

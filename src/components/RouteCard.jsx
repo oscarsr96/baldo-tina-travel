@@ -71,7 +71,7 @@ export default function RouteCard({ route, formData, adminNotes }) {
 
       {/* Expanded content */}
       {expanded && (
-        <RouteDetail route={route} formData={formData} adminNotes={adminNotes} />
+        <RouteDetail route={route} formData={formData} adminNotes={adminNotes} preferences={formData.preferences || []} />
       )}
     </div>
   );
