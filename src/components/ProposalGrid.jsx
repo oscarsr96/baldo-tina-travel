@@ -18,6 +18,7 @@ export default function ProposalGrid({
   adminControls,
   onToggleVisibility,
   onEditNotes,
+  onSaveItemComment,
 }) {
   const [selectedId, setSelectedId] = useState(null);
 
@@ -158,6 +159,8 @@ export default function ProposalGrid({
             formData={selected.form_data}
             adminNotes={selected.admin_notes}
             preferences={selected.form_data?.preferences || []}
+            itemComments={selected.item_comments || {}}
+            onSaveItemComment={onSaveItemComment ? (key, text) => onSaveItemComment(selected.id, key, text) : undefined}
           />
         </div>
       )}

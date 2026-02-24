@@ -13,7 +13,7 @@ const TIER_DESC = {
   premium: "Hoteles boutique 4★, vuelos internos, experiencias gastronómicas",
 };
 
-export default function RouteCard({ route, formData, adminNotes }) {
+export default function RouteCard({ route, formData, adminNotes, itemComments = {}, onSaveItemComment }) {
   const [expanded, setExpanded] = useState(false);
   const style = TIER_STYLES[route.tier];
   const withinBudget = route.costs.totalPerPerson <= formData.budget;
@@ -71,7 +71,7 @@ export default function RouteCard({ route, formData, adminNotes }) {
 
       {/* Expanded content */}
       {expanded && (
-        <RouteDetail route={route} formData={formData} adminNotes={adminNotes} preferences={formData.preferences || []} />
+        <RouteDetail route={route} formData={formData} adminNotes={adminNotes} preferences={formData.preferences || []} itemComments={itemComments} onSaveItemComment={onSaveItemComment} />
       )}
     </div>
   );

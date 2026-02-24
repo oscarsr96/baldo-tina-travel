@@ -10,7 +10,7 @@ const COLORS = {
   red: [212, 131, 106],
 };
 
-export function exportRoutePDF(route, formData, adminNotes = '') {
+export function exportRoutePDF(route, formData, adminNotes = '', itemComments = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageWidth = 210;
   const margin = 20;
@@ -128,6 +128,29 @@ export function exportRoutePDF(route, formData, adminNotes = '') {
     const highlightNames = city.highlights.map((h) => (typeof h === "string" ? h : h.name));
     doc.text(highlightNames.join(", "), margin + 22, y);
     y += 5;
+
+    // Tips de Baldo & Tina para esta ciudad
+    const cityTips = Object.entries(itemComments).filter(
+      ([key, val]) => key.startsWith(`${city.cityId}:`) && val
+    );
+    if (cityTips.length > 0) {
+      checkPageBreak(cityTips.length * 10 + 5);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...COLORS.accent);
+      doc.text("Tips de Baldo & Tina:", margin + 4, y);
+      y += 5;
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(8);
+      cityTips.forEach(([key, val]) => {
+        checkPageBreak(10);
+        const itemName = key.split(":")[1];
+        const tipLines = doc.splitTextToSize(`${itemName}: "${val}"`, contentWidth - 12);
+        doc.text(tipLines, margin + 6, y);
+        y += tipLines.length * 4 + 2;
+      });
+      doc.setFontSize(9);
+      doc.setTextColor(60, 60, 60);
+    }
 
     if (city.recommendedZones.length > 0) {
       doc.setFont("helvetica", "bold");

@@ -123,6 +123,29 @@ export default function AdminRequestDetail() {
     }
   };
 
+  const saveItemComment = async (propId, key, text) => {
+    const prop = proposals.find((p) => p.id === propId);
+    const current = prop?.item_comments || {};
+    const updated = { ...current };
+    if (text) {
+      updated[key] = text;
+    } else {
+      delete updated[key];
+    }
+    const { error } = await supabase
+      .from("proposals")
+      .update({ item_comments: updated })
+      .eq("id", propId);
+    if (error) {
+      toast.error("Error al guardar tip");
+      return;
+    }
+    setProposals((prev) =>
+      prev.map((p) => (p.id === propId ? { ...p, item_comments: updated } : p))
+    );
+    toast.success("Tip guardado");
+  };
+
   const deleteProposals = async () => {
     if (!confirm("¿Eliminar todas las propuestas de esta solicitud?")) return;
     await supabase.from("proposals").delete().eq("request_id", id);
@@ -269,6 +292,7 @@ export default function AdminRequestDetail() {
             adminControls
             onToggleVisibility={toggleVisibility}
             onEditNotes={(propId) => setEditModal(propId)}
+            onSaveItemComment={saveItemComment}
           />
         </div>
       )}

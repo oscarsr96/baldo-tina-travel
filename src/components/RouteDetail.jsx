@@ -2,7 +2,7 @@ import { useState } from "react";
 import CityItinerary from "./CityItinerary";
 import { exportRoutePDF } from "../utils/pdfExport";
 
-export default function RouteDetail({ route, formData, adminNotes, preferences = [] }) {
+export default function RouteDetail({ route, formData, adminNotes, preferences = [], itemComments = {}, onSaveItemComment }) {
   const [selectedCityId, setSelectedCityId] = useState(route.cityDetails[0]?.cityId || null);
 
   const selectedCity = route.cityDetails.find((c) => c.cityId === selectedCityId);
@@ -94,7 +94,7 @@ export default function RouteDetail({ route, formData, adminNotes, preferences =
         {/* Itinerario de la ciudad seleccionada */}
         {selectedCity && (
           <div key={selectedCityId} className="animate-slide-in-right">
-            <CityItinerary city={selectedCity} tier={route.tier} preferences={preferences} />
+            <CityItinerary city={selectedCity} tier={route.tier} preferences={preferences} itemComments={itemComments} onSaveItemComment={onSaveItemComment} />
           </div>
         )}
       </div>
@@ -137,7 +137,7 @@ export default function RouteDetail({ route, formData, adminNotes, preferences =
       {/* Botón PDF */}
       <div className="p-5 border-t border-border">
         <button
-          onClick={() => exportRoutePDF(route, formData, adminNotes)}
+          onClick={() => exportRoutePDF(route, formData, adminNotes, itemComments)}
           className="w-full bg-accent hover:bg-accent/90 text-white font-semibold py-3 rounded-lg transition-colors cursor-pointer"
         >
           📄 Exportar PDF — Ruta {route.label}

@@ -19,7 +19,69 @@ const TYPE_LABELS = {
   tranquilo: "Tranquilo",
 };
 
-function ActivityCard({ activity, fallbackLabel }) {
+function TipDisplay({ comment }) {
+  if (!comment) return null;
+  return (
+    <div className="mt-2 bg-accent/5 border-l-2 border-accent rounded-r-lg px-3 py-2">
+      <p className="text-xs italic text-text leading-relaxed">"{comment}"</p>
+      <p className="text-[10px] text-accent font-semibold mt-1 text-right">— Baldo & Tina</p>
+    </div>
+  );
+}
+
+function TipEditor({ comment, commentKey, onSaveComment }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(comment || "");
+
+  if (!editing) {
+    return (
+      <button
+        onClick={() => { setDraft(comment || ""); setEditing(true); }}
+        className="mt-2 text-[11px] text-accent hover:text-accent/80 cursor-pointer flex items-center gap-1"
+      >
+        {comment ? "✏️ Editar tip" : "💬 Añadir tip personal"}
+      </button>
+    );
+  }
+
+  return (
+    <div className="mt-2 space-y-2">
+      <textarea
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        rows={2}
+        className="w-full bg-input border border-border rounded-lg px-3 py-2 text-xs text-text focus:outline-none focus:border-accent transition-colors resize-none"
+        placeholder="Ej: Pedir el cacio e pepe sí o sí..."
+        autoFocus
+      />
+      <div className="flex gap-2">
+        <button
+          onClick={() => { onSaveComment(commentKey, draft.trim()); setEditing(false); }}
+          className="text-[11px] bg-accent hover:bg-accent/90 text-white px-3 py-1 rounded-lg font-semibold cursor-pointer transition-colors"
+        >
+          Guardar
+        </button>
+        <button
+          onClick={() => setEditing(false)}
+          className="text-[11px] text-muted hover:text-text px-3 py-1 cursor-pointer transition-colors"
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ItemTip({ comment, commentKey, isAdmin, onSaveComment }) {
+  return (
+    <>
+      <TipDisplay comment={comment} />
+      {isAdmin && <TipEditor comment={comment} commentKey={commentKey} onSaveComment={onSaveComment} />}
+    </>
+  );
+}
+
+function ActivityCard({ activity, fallbackLabel, comment, commentKey, isAdmin, onSaveComment }) {
   if (!activity) {
     return (
       <div className="bg-input/50 border border-border rounded-lg p-4 text-center text-muted text-sm italic">
@@ -64,42 +126,52 @@ function ActivityCard({ activity, fallbackLabel }) {
             {icon} {label}
           </span>
         </div>
+        <ItemTip comment={comment} commentKey={commentKey} isAdmin={isAdmin} onSaveComment={onSaveComment} />
       </div>
     </div>
   );
 }
 
-function LunchCard({ spot }) {
+function LunchCard({ spot, comment, commentKey, isAdmin, onSaveComment }) {
   if (!spot) return null;
   return (
-    <div className="bg-card border border-border rounded-lg p-3 flex items-center gap-3">
-      <span className="text-xl">🍽️</span>
-      <div className="min-w-0">
-        <p className="text-sm font-semibold text-text">{spot.name}</p>
-        <p className="text-xs text-muted">
-          {spot.description}
-          {spot.zone && <span className="ml-1 text-accent">· {spot.zone}</span>}
-        </p>
+    <div className="bg-card border border-border rounded-lg p-3">
+      <div className="flex items-center gap-3">
+        <span className="text-xl">🍽️</span>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-text">{spot.name}</p>
+          <p className="text-xs text-muted">
+            {spot.description}
+            {spot.zone && <span className="ml-1 text-accent">· {spot.zone}</span>}
+          </p>
+        </div>
       </div>
+      <ItemTip comment={comment} commentKey={commentKey} isAdmin={isAdmin} onSaveComment={onSaveComment} />
     </div>
   );
 }
 
-function EveningCard({ idea }) {
+function EveningCard({ idea, comment, commentKey, isAdmin, onSaveComment }) {
   if (!idea) return null;
   const icon = TYPE_ICONS[idea.type] || "🌙";
   return (
-    <div className="bg-card border border-border rounded-lg p-3 flex items-center gap-3">
-      <span className="text-xl">{icon}</span>
-      <div className="min-w-0">
-        <p className="text-sm font-semibold text-text">{idea.name}</p>
-        <p className="text-xs text-muted">{idea.description}</p>
+    <div className="bg-card border border-border rounded-lg p-3">
+      <div className="flex items-center gap-3">
+        <span className="text-xl">{icon}</span>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-text">{idea.name}</p>
+          <p className="text-xs text-muted">{idea.description}</p>
+        </div>
       </div>
+      <ItemTip comment={comment} commentKey={commentKey} isAdmin={isAdmin} onSaveComment={onSaveComment} />
     </div>
   );
 }
 
-export default function CityItinerary({ city, tier, preferences = [] }) {
+export default function CityItinerary({ city, tier, preferences = [], itemComments = {}, onSaveItemComment }) {
+  const isAdmin = !!onSaveItemComment;
+  const getComment = (itemName) => itemComments[`${city.cityId}:${itemName}`] || "";
+  const getKey = (itemName) => `${city.cityId}:${itemName}`;
   const [currentDay, setCurrentDay] = useState(0);
   const [slideDir, setSlideDir] = useState(null);
 
@@ -194,7 +266,14 @@ export default function CityItinerary({ city, tier, preferences = [] }) {
           <p className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">
             ☀️ Mañana
           </p>
-          <ActivityCard activity={day.morning} fallbackLabel="Mañana libre" />
+          <ActivityCard
+            activity={day.morning}
+            fallbackLabel="Mañana libre"
+            comment={day.morning ? getComment(day.morning.name) : ""}
+            commentKey={day.morning ? getKey(day.morning.name) : ""}
+            isAdmin={isAdmin}
+            onSaveComment={onSaveItemComment}
+          />
         </div>
 
         {/* Almuerzo */}
@@ -203,7 +282,13 @@ export default function CityItinerary({ city, tier, preferences = [] }) {
             <p className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">
               🍽️ Almuerzo
             </p>
-            <LunchCard spot={day.lunch} />
+            <LunchCard
+              spot={day.lunch}
+              comment={getComment(day.lunch.name)}
+              commentKey={getKey(day.lunch.name)}
+              isAdmin={isAdmin}
+              onSaveComment={onSaveItemComment}
+            />
           </div>
         )}
 
@@ -212,7 +297,14 @@ export default function CityItinerary({ city, tier, preferences = [] }) {
           <p className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">
             🌤️ Tarde
           </p>
-          <ActivityCard activity={day.afternoon} fallbackLabel="Tarde libre" />
+          <ActivityCard
+            activity={day.afternoon}
+            fallbackLabel="Tarde libre"
+            comment={day.afternoon ? getComment(day.afternoon.name) : ""}
+            commentKey={day.afternoon ? getKey(day.afternoon.name) : ""}
+            isAdmin={isAdmin}
+            onSaveComment={onSaveItemComment}
+          />
         </div>
 
         {/* Noche */}
@@ -221,7 +313,13 @@ export default function CityItinerary({ city, tier, preferences = [] }) {
             <p className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">
               🌙 Noche
             </p>
-            <EveningCard idea={day.evening} />
+            <EveningCard
+              idea={day.evening}
+              comment={getComment(day.evening.name)}
+              commentKey={getKey(day.evening.name)}
+              isAdmin={isAdmin}
+              onSaveComment={onSaveItemComment}
+            />
           </div>
         )}
       </div>
