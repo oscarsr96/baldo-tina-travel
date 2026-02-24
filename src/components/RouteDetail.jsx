@@ -1,7 +1,12 @@
+import { useState } from "react";
 import CityItinerary from "./CityItinerary";
 import { exportRoutePDF } from "../utils/pdfExport";
 
 export default function RouteDetail({ route, formData, adminNotes, preferences = [] }) {
+  const [selectedCityId, setSelectedCityId] = useState(route.cityDetails[0]?.cityId || null);
+
+  const selectedCity = route.cityDetails.find((c) => c.cityId === selectedCityId);
+
   return (
     <div className="border-t border-border">
       {/* Transporte */}
@@ -29,12 +34,69 @@ export default function RouteDetail({ route, formData, adminNotes, preferences =
         </div>
       </div>
 
-      {/* Ciudades */}
+      {/* Selector de ciudades */}
       <div className="p-5 space-y-4">
         <h4 className="text-sm font-semibold text-muted uppercase tracking-wider">Detalle por ciudad</h4>
-        {route.cityDetails.map((city) => (
-          <CityItinerary key={city.cityId} city={city} tier={route.tier} preferences={preferences} />
-        ))}
+
+        {/* Fila de cards de ciudades */}
+        <div className={`grid gap-3 ${
+          route.cityDetails.length === 1 ? "grid-cols-1" :
+          route.cityDetails.length === 2 ? "grid-cols-2" :
+          route.cityDetails.length === 3 ? "grid-cols-3" :
+          "grid-cols-2 sm:grid-cols-4"
+        }`}>
+          {route.cityDetails.map((city) => {
+            const isSelected = selectedCityId === city.cityId;
+            return (
+              <div
+                key={city.cityId}
+                onClick={() => setSelectedCityId(city.cityId)}
+                className={`relative rounded-xl overflow-hidden cursor-pointer transition-all ${
+                  isSelected
+                    ? "ring-2 ring-accent shadow-md"
+                    : "border border-border hover:border-accent/50 opacity-75 hover:opacity-100"
+                }`}
+              >
+                {/* Mini hero */}
+                <div className="h-20 sm:h-24 relative">
+                  {city.photo ? (
+                    <img
+                      src={city.photo}
+                      alt={city.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/5" />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-2">
+                    <p className="text-white font-bold text-sm leading-tight drop-shadow">
+                      {city.emoji} {city.name}
+                    </p>
+                    <p className="text-white/70 text-[11px]">
+                      {city.nights} noche{city.nights > 1 ? "s" : ""} · €{city.subtotal}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Indicador de seleccionado */}
+                {isSelected && (
+                  <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-accent rounded-full flex items-center justify-center">
+                    <span className="text-white text-[10px] font-bold">✓</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Itinerario de la ciudad seleccionada */}
+        {selectedCity && (
+          <div key={selectedCityId} className="animate-slide-in-right">
+            <CityItinerary city={selectedCity} tier={route.tier} preferences={preferences} />
+          </div>
+        )}
       </div>
 
       {/* Resumen de costes */}
